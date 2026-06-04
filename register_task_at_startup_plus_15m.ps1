@@ -1,5 +1,5 @@
 # Creates (or updates) a Windows Task Scheduler task that launches
-# WindowsTimeTracker.py at logon and rechecks every 30 minutes.
+# sedentary_reminder.py at logon and rechecks every 30 minutes.
 # Run this script once as Administrator.
 
 $taskName   = "SedentaryReminder"

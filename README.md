@@ -30,16 +30,16 @@ pip install pyautogui windows-toasts pynput pystray pillow pywin32 psutil
 Run normally (with a console window):
 
 ```bash
-python sedentary_reminder.py
+python WindowsTimeTracker.py
 ```
 
 Run silently with no console window:
 
 ```bash
-pythonw sedentary_reminder.py
+pythonw WindowsTimeTracker.py
 ```
 
-You can also rename the file to `sedentary_reminder.pyw` and double-click it to launch without a terminal.
+You can also rename the file to `WindowsTimeTracker.pyw` and double-click it to launch without a terminal.
 
 The script will appear as a small circle in the system tray (bottom-right). Right-click the icon for options.
 
@@ -57,7 +57,7 @@ The script will appear as a small circle in the system tray (bottom-right). Righ
 
 ## Configuration
 
-Open `sedentary_reminder.py` and edit the settings block near the top:
+Open `WindowsTimeTracker.py` and edit the settings block near the top:
 
 ```python
 BREAK_THRESHOLD_SECONDS = 3 * 60   # idle time required to count as a break (default: 3 min)
@@ -109,7 +109,7 @@ The report file is saved as `sedentary_report_1w_YYYY-MM-DD.txt` (or `2w`) in `%
 To have the script start automatically with Windows:
 
 1. Press `Win + R`, type `shell:startup`, and press Enter
-2. Create a shortcut to `sedentary_reminder.pyw` (or `pythonw.exe` pointing to the script) in that folder
+2. Create a shortcut to `WindowsTimeTracker.pyw` (or `pythonw.exe` pointing to the script) in that folder
 
 ## License
 

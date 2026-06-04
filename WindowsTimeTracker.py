@@ -16,10 +16,10 @@ Requirements:
     pip install pyautogui windows-toasts pynput pystray pillow pywin32 psutil
 
 Run:
-    python sedentary_reminder.py
+    python WindowsTimeTracker.py
 
 To run silently with no console window:
-    pythonw sedentary_reminder.py  (or rename to .pyw)
+    pythonw WindowsTimeTracker.py  (or rename to .pyw)
 """
 
 import ctypes

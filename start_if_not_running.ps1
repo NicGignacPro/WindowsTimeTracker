@@ -1,7 +1,7 @@
-# Checks if sedentary_reminder.py is already running; starts it if not.
+# Checks if WindowsTimeTracker.py is already running; starts it if not.
 # Schedule this script with Windows Task Scheduler.
 
-$scriptName = "sedentary_reminder.py"
+$scriptName = "WindowsTimeTracker.py"
 $scriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $scriptPath = Join-Path $scriptDir $scriptName
 

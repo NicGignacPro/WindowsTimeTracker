@@ -1,12 +1,12 @@
 # ============================================================
 #  Create-SedentaryReminderTask.ps1
-#  Crée une tâche planifiée qui lance sedentary_reminder.py
+#  Crée une tâche planifiée qui lance WindowsTimeTracker.py
 #  au démarrage de Windows (connexion de l'utilisateur).
 #  À exécuter UNE SEULE FOIS en tant qu'Administrateur.
 # ============================================================
 
 $TaskName    = "SedentaryReminder"
-$ScriptPath  = "C:\Users\MANI4218\Documents\Projets\sedentary_reminder\sedentary_reminder.py"
+$ScriptPath  = "C:\Users\MANI4218\Documents\Projets\WindowsTimeTracker\WindowsTimeTracker.py"
 $PythonExe   = (Get-Command python -ErrorAction SilentlyContinue).Source
 
 # ── Vérifications préliminaires ──────────────────────────────
@@ -59,7 +59,7 @@ $Task = Register-ScheduledTask `
     -Trigger    $Trigger `
     -Settings   $Settings `
     -Principal  $Principal `
-    -Description "Lance sedentary_reminder.py automatiquement à la connexion Windows."
+    -Description "Lance WindowsTimeTracker.py automatiquement à la connexion Windows."
 
 if ($Task) {
     Write-Host ""

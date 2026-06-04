@@ -16,10 +16,10 @@ Requirements:
     pip install pyautogui windows-toasts pynput pystray pillow pywin32 psutil
 
 Run:
-    python sedentary_reminder.py
+    python WindowsTimeTracker.py
 
 To run silently with no console window:
-    pythonw sedentary_reminder.py  (or rename to .pyw)
+    pythonw WindowsTimeTracker.py  (or rename to .pyw)
 """
 
 import ctypes
@@ -77,7 +77,7 @@ POLL_INTERVAL_SECONDS   = 5        # main loop frequency
 DEVICE_POLL_SECONDS     = BREAK_THRESHOLD_SECONDS  # check camera/mic registry
 LOG_FILE                = os.path.join(os.path.expanduser("~"), "sedentary_log.csv")
 CHECKPOINT_FILE         = os.path.join(os.path.expanduser("~"), "sedentary_checkpoint.txt")
-LOCK_FILE               = os.path.join(os.path.expanduser("~"), "sedentary_reminder.lock")
+LOCK_FILE               = os.path.join(os.path.expanduser("~"), "WindowsTimeTracker.lock")
 # Alert sound: path to a .wav file, or None to use the built-in Windows chime
 ALERT_SOUND             = None
 # ──────────────────────────────────────────────────────────────────────────────
@@ -846,7 +846,7 @@ def build_menu():
 def start_tray() -> pystray.Icon:
     menu = pystray.Menu(lambda: build_menu())
     icon = pystray.Icon(
-        "sedentary_reminder",
+        "WindowsTimeTracker",
         make_icon_image("#4CAF50"),
         "Sedentary Reminder",
         menu,
@@ -1031,7 +1031,7 @@ def main() -> None:
             if psutil.pid_exists(old_pid):
                 proc = psutil.Process(old_pid)
                 # Only block if it's actually our script, not some other Python process
-                if any("sedentary_reminder" in c for c in proc.cmdline()):
+                if any("WindowsTimeTracker" in c for c in proc.cmdline()):
                     print(f"Already running (PID {old_pid}). Exiting.")
                     return
         except Exception:

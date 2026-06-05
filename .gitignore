@@ -1,0 +1,14 @@
+# Runtime files — these live in the user's home folder, but guard against
+# accidental copies being dropped in the project directory
+*.csv
+*.lock
+*_checkpoint.txt
+*_report_*.txt
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyw[cod]
+
+# VS Code
+.vscode/

@@ -4,9 +4,9 @@ WindowsTimeTracker — Windows Notification Script
 Sits in the system tray. Right-click the icon for options.
 
 Activity = mouse movement, keyboard input, or in a call (camera/mic in use).
-A break  = fully idle for 2+ minutes straight.
+A break  = fully idle for 3+ minutes straight (BREAK_THRESHOLD_SECONDS).
 
-After 30 min of continuous activity, a notification fires.
+After 40 min of continuous activity, a notification fires (ALERT_AFTER_SECONDS).
 If ignored, repeats every 5 min until a break is detected or timer is reset.
 
 Also tracks daily active time and logs sessions to:
@@ -105,7 +105,6 @@ state = {
     "alerted":            False,
     "last_alert_time":    None,
     "reset_requested":    False,
-    "paused":             False,
     # Session tracking
     "session_start":      datetime.now(),   # wall-clock start of current active session
     "session_active":     True,             # are we currently in an active session?
@@ -744,13 +743,6 @@ def on_reset(icon, item) -> None:
         state["reset_requested"] = True
 
 
-def on_pause_resume(icon, item) -> None:
-    with _lock:
-        state["paused"] = not state["paused"]
-    status = "paused" if state["paused"] else "resumed"
-    print(f"[{time.strftime('%H:%M:%S')}] Timer {status}.")
-
-
 def on_show_today(icon, item) -> None:
     with _lock:
         total     = state["today_total_secs"]
@@ -817,10 +809,6 @@ def on_quit(icon, item) -> None:
     icon.stop()
 
 
-def pause_resume_label(item) -> str:
-    return "Resume timer" if state["paused"] else "Pause timer"
-
-
 def today_label(item) -> str:
     with _lock:
         total  = state["today_total_secs"]
@@ -858,7 +846,6 @@ def build_menu():
         pystray.MenuItem("Report: last 2 weeks", on_report_2w),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Reset timer",        on_reset),
-        pystray.MenuItem(pause_resume_label,   on_pause_resume),
         pystray.Menu.SEPARATOR,
         pystray.MenuItem("Quit",               on_quit),
     )
@@ -877,10 +864,8 @@ def start_tray() -> pystray.Icon:
     return icon
 
 
-def update_tray_icon(icon, alerted: bool, paused: bool) -> None:
-    if paused:
-        color = "#9E9E9E"
-    elif alerted:
+def update_tray_icon(icon, alerted: bool) -> None:
+    if alerted:
         color = "#F44336"
     else:
         color = "#4CAF50"
@@ -1150,7 +1135,6 @@ def main() -> None:
         check_day_rollover(now)
 
         with _lock:
-            paused              = state["paused"]
             reset_requested     = state["reset_requested"]
             last_key            = _last_key_time
             woke                = _woke_from_sleep
@@ -1183,7 +1167,7 @@ def main() -> None:
                 state["idle_since_wall"] = None
                 state["alerted"]         = False
                 state["last_alert_time"] = None
-            update_tray_icon(icon, alerted=False, paused=paused)
+            update_tray_icon(icon, alerted=False)
             continue
 
         # ── Manual reset ──
@@ -1198,11 +1182,7 @@ def main() -> None:
                 state["alerted"]         = False
                 state["last_alert_time"] = None
                 state["reset_requested"] = False
-            update_tray_icon(icon, alerted=False, paused=False)
-            continue
-
-        if paused:
-            update_tray_icon(icon, alerted=state["alerted"], paused=True)
+            update_tray_icon(icon, alerted=False)
             continue
 
         # ── Detect activity ──
@@ -1241,7 +1221,7 @@ def main() -> None:
                         state["idle_since_wall"] = None
                         state["alerted"]         = False
                         state["last_alert_time"] = None
-                    update_tray_icon(icon, alerted=False, paused=False)
+                    update_tray_icon(icon, alerted=False)
                     continue
             with _lock:
                 state["idle_since"]      = None
@@ -1262,7 +1242,7 @@ def main() -> None:
         on_a_break      = idle_duration >= BREAK_THRESHOLD_SECONDS
         active_duration = now - active_since
 
-        update_tray_icon(icon, alerted=alerted, paused=False)
+        update_tray_icon(icon, alerted=alerted)
 
         if on_a_break:
             continue
@@ -1284,7 +1264,7 @@ def main() -> None:
                 with _lock:
                     state["alerted"]         = True
                     state["last_alert_time"] = now
-                update_tray_icon(icon, alerted=True, paused=False)
+                update_tray_icon(icon, alerted=True)
         else:
             if now - last_alert_time >= REPEAT_ALERT_SECONDS:
                 active_minutes = int(active_duration // 60)

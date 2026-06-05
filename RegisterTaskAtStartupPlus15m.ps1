@@ -5,7 +5,12 @@
 # --- Install Python dependencies if missing --------------------------------
 $pythonExe = $null
 $candidates = @(
-    "C:\Users\MANI4218\AppData\Local\miniconda3\python.exe"
+    "$env:USERPROFILE\AppData\Local\miniconda3\python.exe",
+    "$env:USERPROFILE\AppData\Local\miniforge3\python.exe",
+    "$env:USERPROFILE\AppData\Local\Programs\Python\Python313\python.exe",
+    "$env:USERPROFILE\AppData\Local\Programs\Python\Python312\python.exe",
+    "$env:USERPROFILE\AppData\Local\Programs\Python\Python311\python.exe",
+    "$env:USERPROFILE\AppData\Local\Programs\Python\Python310\python.exe"
 )
 foreach ($c in $candidates) {
     if (Test-Path $c) { $pythonExe = $c; break }

@@ -1,5 +1,5 @@
 """
-Sedentary Reminder — Windows Notification Script
+WindowsTimeTracker — Windows Notification Script
 -------------------------------------------------
 Sits in the system tray. Right-click the icon for options.
 
@@ -10,7 +10,7 @@ After 30 min of continuous activity, a notification fires.
 If ignored, repeats every 5 min until a break is detected or timer is reset.
 
 Also tracks daily active time and logs sessions to:
-  %USERPROFILE%/sedentary_log.csv
+  %USERPROFILE%/WindowsTimeTracker_log.csv
 
 Requirements:
     pip install pyautogui windows-toasts pynput pystray pillow pywin32 psutil
@@ -75,9 +75,9 @@ ALERT_AFTER_SECONDS           = 40 * 60  # continuous active time before first a
 REPEAT_ALERT_SECONDS    = 5 * 60   # repeat alert interval (5 min)
 POLL_INTERVAL_SECONDS   = 5        # main loop frequency
 DEVICE_POLL_SECONDS     = BREAK_THRESHOLD_SECONDS  # check camera/mic registry
-LOG_FILE                = os.path.join(os.path.expanduser("~"), "sedentary_log.csv")
-CHECKPOINT_FILE         = os.path.join(os.path.expanduser("~"), "sedentary_checkpoint.txt")
-LOCK_FILE               = os.path.join(os.path.expanduser("~"), "sedentary_reminder.lock")
+LOG_FILE                = os.path.join(os.path.expanduser("~"), "WindowsTimeTracker_log.csv")
+CHECKPOINT_FILE         = os.path.join(os.path.expanduser("~"), "WindowsTimeTracker_checkpoint.txt")
+LOCK_FILE               = os.path.join(os.path.expanduser("~"), "WindowsTimeTracker.lock")
 # Alert sound: path to a .wav file, or None to use the built-in Windows chime
 ALERT_SOUND             = None
 # ──────────────────────────────────────────────────────────────────────────────
@@ -325,7 +325,7 @@ def generate_report(weeks: int = 1) -> None:
 
     report_path = os.path.join(
         os.path.expanduser("~"),
-        f"sedentary_report_{weeks}w_{date.today().isoformat()}.txt",
+        f"WindowsTimeTracker_report_{weeks}w_{date.today().isoformat()}.txt",
     )
     with open(report_path, "w", encoding="utf-8") as f:
         f.write(report_text)
@@ -747,7 +747,7 @@ def on_show_today(icon, item) -> None:
         start     = state["session_start"]
     if active and start.date() == date.today():
         total += (datetime.now() - start).total_seconds()
-    toaster = WindowsToaster("Sedentary Reminder")
+    toaster = WindowsToaster("WindowsTimeTracker")
     toast   = Toast()
     toast.text_fields = [
         f"Today's active time: {format_duration(total)} 📊",
@@ -765,7 +765,7 @@ def on_show_week(icon, item) -> None:
         today_total += (datetime.now() - start).total_seconds()
     # Week total from CSV + today's in-memory total (today may not be fully flushed yet)
     week_total = get_week_total_from_log() + today_total
-    toaster = WindowsToaster("Sedentary Reminder")
+    toaster = WindowsToaster("WindowsTimeTracker")
     toast   = Toast()
     mon = date.today() - timedelta(days=date.today().weekday())
     toast.text_fields = [
@@ -793,6 +793,16 @@ def on_report_2w(icon, item) -> None:
 
 def on_quit(icon, item) -> None:
     close_current_session(datetime.now())
+    try:
+        os.remove(LOCK_FILE)
+    except Exception:
+        pass
+    # Force-exit after a short delay in a daemon thread so we don't hang
+    # waiting for icon.stop() to return (pystray can deadlock on Windows).
+    def _force_exit():
+        time.sleep(0.5)
+        os._exit(0)
+    threading.Thread(target=_force_exit, daemon=True).start()
     icon.stop()
 
 
@@ -846,9 +856,9 @@ def build_menu():
 def start_tray() -> pystray.Icon:
     menu = pystray.Menu(lambda: build_menu())
     icon = pystray.Icon(
-        "sedentary_reminder",
+        "WindowsTimeTracker",
         make_icon_image("#4CAF50"),
-        "Sedentary Reminder",
+        "WindowsTimeTracker",
         menu,
     )
     thread = threading.Thread(target=icon.run, daemon=True)
@@ -871,7 +881,7 @@ def update_tray_icon(icon, alerted: bool, paused: bool) -> None:
         start  = state["session_start"]
     if active and start.date() == date.today():
         total += (datetime.now() - start).total_seconds()
-    icon.title = f"Sedentary Reminder — Today: {format_duration(total)}"
+    icon.title = f"WindowsTimeTracker — Today: {format_duration(total)}"
     icon.update_menu()  # refresh menu labels (Today / This week) with current values
 
 
@@ -903,7 +913,7 @@ def _sleep_wake_thread() -> None:
 
     wc            = win32gui.WNDCLASS()
     wc.lpfnWndProc = wnd_proc
-    wc.lpszClassName = "SedentaryReminderWatcher"
+    wc.lpszClassName = "WindowsTimeTrackerWatcher"
     wc.hInstance  = win32api.GetModuleHandle(None)
     win32gui.RegisterClass(wc)
     hwnd = win32gui.CreateWindow(
@@ -986,7 +996,7 @@ def play_alert_sound() -> None:
     threading.Thread(target=_play, daemon=True).start()
 
 
-_interactable_toaster = InteractableWindowsToaster("Sedentary Reminder")
+_interactable_toaster = InteractableWindowsToaster("WindowsTimeTracker")
 
 
 def send_notification(active_minutes: int, is_repeat: bool) -> None:
@@ -1031,7 +1041,7 @@ def main() -> None:
             if psutil.pid_exists(old_pid):
                 proc = psutil.Process(old_pid)
                 # Only block if it's actually our script, not some other Python process
-                if any("sedentary_reminder" in c for c in proc.cmdline()):
+                if any("WindowsTimeTracker" in c for c in proc.cmdline()):
                     print(f"Already running (PID {old_pid}). Exiting.")
                     return
         except Exception:
@@ -1039,7 +1049,7 @@ def main() -> None:
     with open(LOCK_FILE, "w") as f:
         f.write(str(os.getpid()))
 
-    print("Sedentary Reminder is running.")
+    print("WindowsTimeTracker is running.")
     print("  Right-click the system tray icon to see today's total, reset, or pause.")
     print(f"  Daily log saved to: {LOG_FILE}")
     print("  Press Ctrl+C to stop.\n")

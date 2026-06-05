@@ -1,19 +1,19 @@
 # Creates (or updates) a Windows Task Scheduler task that launches
-# WindowsTimeTracker.py at logon and rechecks every 30 minutes.
+# WindowsTimeTracker.py at logon and rechecks every 15 minutes.
 # Run this script once as Administrator.
 
-$taskName   = "SedentaryReminder"
+$taskName   = "WindowsTimeTracker"
 $scriptDir  = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$watcherPs1 = Join-Path $scriptDir "start_if_not_running.ps1"
+$watcherPs1 = Join-Path $scriptDir "StartIfNotRunning.ps1"
 
 # --- Action: run the watcher script hidden --------------------------------
 $action = New-ScheduledTaskAction `
     -Execute "powershell.exe" `
     -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -NonInteractive -File `"$watcherPs1`""
 
-# --- Triggers: at logon + every 30 minutes --------------------------------
+# --- Triggers: at logon + every 15 minutes --------------------------------
 $triggerLogon  = New-ScheduledTaskTrigger -AtLogOn
-$triggerRepeat = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 30) `
+$triggerRepeat = New-ScheduledTaskTrigger -RepetitionInterval (New-TimeSpan -Minutes 15) `
                      -Once -At (Get-Date)
 
 # --- Settings -------------------------------------------------------------
@@ -44,4 +44,4 @@ Register-ScheduledTask @params | Out-Null
 
 Write-Host "Task '$taskName' registered successfully." -ForegroundColor Green
 Write-Host "  Watcher : $watcherPs1"
-Write-Host "  Triggers: at logon + every 30 minutes"
+Write-Host "  Triggers: at logon + every 15 minutes"

@@ -1,4 +1,4 @@
-# Sedentary Reminder
+# WindowsTimeTracker
 
 A lightweight Windows system-tray script that reminds you to take a break when you've been continuously active at your computer for too long. It also tracks and logs your daily and weekly active time.
 
@@ -8,7 +8,7 @@ A lightweight Windows system-tray script that reminds you to take a break when y
 - **Smart activity detection** — tracks mouse movement, keyboard input, and whether your camera or microphone is in use (e.g. during calls)
 - **Break detection** — a break is counted after 3 minutes of full inactivity
 - **System tray icon** — color-coded (green = active, yellow = alerted); right-click for options
-- **Session logging** — each active session is appended to `~/sedentary_log.csv`
+- **Session logging** — each active session is appended to `~/WindowsTimeTracker_log.csv`
 - **Daily & weekly stats** — view today's and this week's active time directly from the tray
 - **Work-hours report** — generate a 1- or 2-week report showing your first clock-in, last clock-out, and total active time per day — useful for filling in a time sheet
 - **Pause / Resume** — temporarily suspend the timer from the tray menu
@@ -68,7 +68,7 @@ ALERT_SOUND             = None     # path to a .wav file, or None to use the Win
 
 ## Session log
 
-Sessions are written to `%USERPROFILE%\sedentary_log.csv` (e.g. `C:\Users\YourName\sedentary_log.csv`) with the following columns:
+Sessions are written to `%USERPROFILE%\WindowsTimeTracker_log.csv` (e.g. `C:\Users\YourName\WindowsTimeTracker_log.csv`) with the following columns:
 
 | Column | Description |
 |---|---|
@@ -102,7 +102,7 @@ Week of Mar 24 – Mar 30, 2026
   ...
 ```
 
-The report file is saved as `sedentary_report_1w_YYYY-MM-DD.txt` (or `2w`) in `%USERPROFILE%\`.
+The report file is saved as `WindowsTimeTracker_report_1w_YYYY-MM-DD.txt` (or `2w`) in `%USERPROFILE%\`.
 
 ## Run on startup (optional)
 

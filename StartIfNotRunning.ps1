@@ -11,10 +11,12 @@ $running = Get-CimInstance Win32_Process -Filter "Name LIKE 'python%'" |
 
 if (-not $running) {
     # Use pythonw so no console window appears
-    $pythonw = (Get-Command pythonw.exe -ErrorAction SilentlyContinue)?.Source
+    $cmd = Get-Command pythonw.exe -ErrorAction SilentlyContinue
+    $pythonw = if ($cmd) { $cmd.Source } else { $null }
     if (-not $pythonw) {
         # Fall back to python.exe if pythonw is not on PATH
-        $pythonw = (Get-Command python.exe -ErrorAction SilentlyContinue)?.Source
+        $cmd = Get-Command python.exe -ErrorAction SilentlyContinue
+        $pythonw = if ($cmd) { $cmd.Source } else { $null }
     }
 
     if ($pythonw) {

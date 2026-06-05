@@ -27,8 +27,19 @@ import time
 import threading
 import csv
 import os
+import subprocess
+import sys
 import winsound
 from datetime import datetime, date, timedelta
+
+# ── Auto-install missing dependencies ──────────────────────────────────────
+_REQUIRED = ["pyautogui", "windows-toasts", "pynput", "pystray", "Pillow", "pywin32", "psutil"]
+for _pkg in _REQUIRED:
+    try:
+        __import__(_pkg.lower().replace("-", "_"))
+    except ImportError:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", _pkg, "--quiet"])
+# ───────────────────────────────────────────────────────────────────────────
 
 import winreg
 import pyautogui
